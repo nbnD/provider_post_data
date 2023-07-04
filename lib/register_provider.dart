@@ -9,8 +9,7 @@ import 'package:http/http.dart';
 import 'register_response.dart';
 
 class RegisterProvider with ChangeNotifier {
-  LoginResponse loginResponse = LoginResponse();
-  int? _id;
+  RegisterResponse loginResponse = RegisterResponse();
   int _statusCode = 0;
   bool isLoading = false;
 
@@ -35,10 +34,10 @@ class RegisterProvider with ChangeNotifier {
   }
 
   Future<FutureOr> onValue(Response response) async {
-    var result;
+    String? result;
 
     final Map<String, dynamic> responseData = json.decode(response.body);
-    loginResponse = LoginResponse.fromJson(responseData);
+    loginResponse = RegisterResponse.fromJson(responseData);
 
     _statusCode = response.statusCode;
     if (response.statusCode == 200) {

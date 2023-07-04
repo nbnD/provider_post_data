@@ -1,11 +1,11 @@
-class LoginResponse {
+class RegisterResponse {
   int? id;
   String? token;
   String? error;
 
-  LoginResponse({this.id, this.token, this.error});
+  RegisterResponse({this.id, this.token, this.error});
 
-  LoginResponse.fromJson(Map<String, dynamic> json) {
+  RegisterResponse.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     token = json['token'];
     error = json['error'];

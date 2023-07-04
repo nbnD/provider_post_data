@@ -13,12 +13,14 @@ class _LoginScreenState extends State<LoginScreen> {
   FocusNode emailNode = FocusNode();
   FocusNode passwordNode = FocusNode();
 
+  final _formKey = GlobalKey<FormState>();
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final loginProvider = Provider.of<RegisterProvider>(context);
+    final registerProvider = Provider.of<RegisterProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Register Screen"),
@@ -26,56 +28,61 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              _buildTextField(emailController, "Email", emailNode, passwordNode,
-                  const Icon(Icons.person), false),
-              const SizedBox(height: 20),
-              _buildTextField(passwordController, "Password", passwordNode,
-                  null, const Icon(Icons.lock), true),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () {
-                    final loginResponse = loginProvider.loginUser(
-                        emailController.text, passwordController.text);
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildTextField(emailController, "Email", emailNode,
+                    passwordNode, const Icon(Icons.person), false),
+                const SizedBox(height: 20),
+                _buildTextField(passwordController, "Password", passwordNode,
+                    null, const Icon(Icons.lock), true),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        final loginResponse = registerProvider.loginUser(
+                            emailController.text, passwordController.text);
 
-                    loginResponse.then((response) {
-                      if (loginProvider.statusCode == 200) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Token: ${loginProvider.loginResponse.token!}  Id: ${loginProvider.loginResponse.id.toString()}'),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Login Failed"),
-                          ),
-                        );
+                        loginResponse.then((response) {
+                          if (registerProvider.statusCode == 200) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Token: ${registerProvider.loginResponse.token!}  Id: ${registerProvider.loginResponse.id.toString()}'),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Registration Failed"),
+                              ),
+                            );
+                          }
+                        });
                       }
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    backgroundColor: Colors.blue,
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: registerProvider.isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const Text(
+                            'Register',
+                            style: TextStyle(fontSize: 16),
+                          ),
                   ),
-                  child: loginProvider.isLoading
-                      ? const CircularProgressIndicator(
-                          color: Colors.white,
-                        )
-                      : const Text(
-                          'Register',
-                          style: TextStyle(fontSize: 16),
-                        ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -91,7 +98,12 @@ class _LoginScreenState extends State<LoginScreen> {
       bool isPassword) {
     return TextFormField(
         controller: controller,
-        validator: (value) {},
+        validator: (value) {
+          if (value!.isEmpty) {
+            return "$label is required";
+          }
+          return null;
+        },
         keyboardType: TextInputType.emailAddress,
         obscureText: isPassword,
         focusNode: focusNode,
