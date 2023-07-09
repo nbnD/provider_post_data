@@ -43,15 +43,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        final loginResponse = registerProvider.loginUser(
+                        final registerResponse = registerProvider.registerUser(
                             emailController.text, passwordController.text);
 
-                        loginResponse.then((response) {
+                        registerResponse.then((response) {
                           if (registerProvider.statusCode == 200) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    'Token: ${registerProvider.loginResponse.token!}  Id: ${registerProvider.loginResponse.id.toString()}'),
+                                    'Token: ${registerProvider.registerResponse.token!}  Id: ${registerProvider.registerResponse.id.toString()}'),
                               ),
                             );
                           } else {

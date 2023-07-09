@@ -9,25 +9,25 @@ import 'package:http/http.dart';
 import 'register_response.dart';
 
 class RegisterProvider with ChangeNotifier {
-  RegisterResponse loginResponse = RegisterResponse();
+  RegisterResponse registerResponse = RegisterResponse();
   int _statusCode = 0;
   bool isLoading = false;
 
   int get statusCode => _statusCode;
 
-  set loggedInStatus(int value) {
+  set registerStatus(int value) {
     _statusCode = value;
   }
 
-  loginUser(String email, String password) async {
+  registerUser(String email, String password) async {
     isLoading = true;
     notifyListeners();
-    final Map<String, dynamic> loginData = {
+    final Map<String, dynamic> registerData = {
       "email": email.trim(),
       "password": password.trim(),
     };
-    return await post(Uri.parse(AppUrls.loginUrl),
-        body: jsonEncode(loginData),
+    return await post(Uri.parse(AppUrls.registerUrl),
+        body: jsonEncode(registerData),
         headers: {
           'Content-Type': 'application/json',
         }).then(onValue).catchError(onError);
@@ -37,14 +37,14 @@ class RegisterProvider with ChangeNotifier {
     String? result;
 
     final Map<String, dynamic> responseData = json.decode(response.body);
-    loginResponse = RegisterResponse.fromJson(responseData);
+    registerResponse = RegisterResponse.fromJson(responseData);
 
     _statusCode = response.statusCode;
     if (response.statusCode == 200) {
-      result = loginResponse.token;
+      result = registerResponse.token;
       isLoading = false;
     } else {
-      result = loginResponse.error;
+      result = registerResponse.error;
       isLoading = false;
     }
 
